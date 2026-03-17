@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Hero from './body components/hero'
 import PlaySection from './body components/playSection'
 import Data from './body components/dataDisplay'
@@ -15,13 +15,23 @@ import Science from './sideBarComponents/science'
 import Tech from './sideBarComponents/tech'
 import Favorite from './favorite'
 import Search from './body components/search'
-import { useContext } from 'react'
+import { useContext} from 'react'
 import { SearchContext } from './searchContext'
-
+import { useLocation } from 'react-router-dom'
 
 const Body = () => {
-  const {submittedQuery } = useContext(SearchContext)
+  const location = useLocation();
+  const {submittedQuery,setSubmittedQuery } = useContext(SearchContext)
+   useEffect(() => {
+      if (submittedQuery){
+        setSubmittedQuery("");
+      }
+    }, [location.pathname])
   return (
+
+   
+
+
     <main style={{ margin: "0px", flexGrow: "1", overscrollBehavior: "none", height: "100%" }}>
       <Hero />
       { submittedQuery ? (<Search/>) : (  

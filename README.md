@@ -16,13 +16,12 @@ The React Compiler is not enabled on this template because of its impact on dev 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
 
-
-'https://itunes.apple.com/search?term=education&entity=podcastEpisode&limit=100genreId=1304'
-'https://itunes.apple.com/search?term=entrepreneurship&entity=podcastEpisode&limit=100&genreId=1493'
-'https://itunes.apple.com/search?term=finance&entity=podcastEpisode&limit=100&genreId=1412'
-'https://itunes.apple.com/search?term=government&entity=podcastEpisode&limit=100genreId=1511'
-'https://itunes.apple.com/search?term=history&entity=podcastEpisode&limit=100genreId=1487'
-'https://itunes.apple.com/search?term=leadership&entity=podcastEpisode&limit=100genreId=1491'
-'https://itunes.apple.com/search?term=news&entity=podcastEpisode&limit=100genreId=1489'
-'https://itunes.apple.com/search?term=science&entity=podcastEpisode&limit=100genreId=1315'
-'https://itunes.apple.com/search?term=tech&entity=podcastEpisode&limit=100genreId=1318'
+But now make a post after fixing the sidebar items.
+Advanced Feature:
+    Play State Modal Display
+    Pagination
+    Responsive Design
+    User Registration and Authentication + Database Synchronoization
+    SEO Optimization 
+    Security Link Implementation
+    Recently Played Feature
