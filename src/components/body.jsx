@@ -13,7 +13,8 @@ import Leader from './sideBarComponents/leadership'
 import News from './sideBarComponents/news'
 import Science from './sideBarComponents/science'
 import Tech from './sideBarComponents/tech'
-
+import Favorite from './favorite'
+import Search from './body components/search'
 
 const Body = () => {
   return (
@@ -21,6 +22,7 @@ const Body = () => {
       <Hero />
       <Routes>
         <Route path="/" element={<Data />} />
+        <Route path='/search' element={<Search/>}/>
         <Route path="/career" element={<Career/>} />
         <Route path="/education" element={<Education/>} />
         <Route path="/entrepreneur" element={<Entrepreneur/>} />
@@ -31,6 +33,7 @@ const Body = () => {
         <Route path="/news" element={<News/>} />
         <Route path="/science" element={<Science/>} />
         <Route path="/tech" element={<Tech/>} />
+        <Route path='/favorite' element={<Favorite/>}/>
       </Routes>
       <PlaySection />
 

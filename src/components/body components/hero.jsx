@@ -1,12 +1,17 @@
 import React from 'react';
 {/*import SlidingList from './slidingText'*/}
 
-const Hero = () => {
-   const [search, setSearch ] = React.useState("");
-   const handleChange = (e) =>{
-    setSearch(e.target.value);
-   };
+import { useContext } from 'react';
+import { SearchContext } from '../searchContext';
 
+
+const Hero = () => {
+   const {query, setQuery, setSubmittedQuery}  = useContext(SearchContext)
+   const handleSubmit = (e) =>{
+    e.preventDefault();
+    setSubmittedQuery(query)
+   }
+  
     return (
         <section id="heroSection"
             style={{ textAlign:"center", 
@@ -43,12 +48,17 @@ const Hero = () => {
                         
                     }}>
           
-                        
+                        <form onSubmit={handleSubmit}
+                            style={{
+                                width:"100%",
+                            }}
+                        >  
+
                     <input 
                     id="search"
                     type='text' 
-                    onChange={handleChange}
-                    defaultValue="Search by creators name only"
+                    onChange={(e) => setQuery(e.target.value)}
+                    value={query}
                     style={{
                             height:"40px",
                             width: "100%", 
@@ -60,6 +70,7 @@ const Hero = () => {
                             borderRadius: "30px", 
                             textAlign:"center"
                         }} />
+                        </form>
             </div>
 
             {/*  <SlidingList/> */} 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
+import { useFavorites } from '../../context/favoriteContext';
 
 const formatDuration = (ms) => {
     if (!ms) return "0:00";
@@ -13,19 +14,20 @@ const formatDuration = (ms) => {
 };
 
 const DataDisplay = () => {
+    // 2. Access global favorites and the toggle function
+    const { favorites, toggleFavorite } = useFavorites();
+    
     const [podcasts, setPodcasts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeRowId, setActiveRowId] = useState(null);
     const [playingId, setPlayingId] = useState(null);
-    const [audio] = useState(() => new Audio()); // Initialise safely
+    const [audio] = useState(() => new Audio());
 
-    // 1. Define this FIRST so toggleFavorite can see it
     const showRowModal = (id) => {
         setActiveRowId(id);
         setTimeout(() => setActiveRowId(null), 3000);
     };
 
-    // 2. Audio Cleanup - Stops music when you leave the page
     useEffect(() => {
         return () => {
             audio.pause();
@@ -33,16 +35,15 @@ const DataDisplay = () => {
         };
     }, [audio]);
 
-    const toggleFavorite = (id) => {
-        setPodcasts(prev => {
-            const updated = prev.map(p => p.id === id ? { ...p, favorite: !p.favorite } : p);
-            const favoriteIds = updated.filter(p => p.favorite).map(p => p.id);
-            localStorage.setItem('my_podcast_favorites', JSON.stringify(favoriteIds));
-
-            const item = updated.find(p => p.id === id);
-            if (item?.favorite) showRowModal(id);
-            return updated;
-        });
+    // 3. UPDATED: Uses the context toggle and handles the "Added" modal
+    const handleFavoriteClick = (podcast) => {
+        const isCurrentlyFav = favorites.some(fav => fav.id === podcast.id);
+        toggleFavorite(podcast);
+        
+        // Only show the "Added" popup if we are favoriting it (not removing)
+        if (!isCurrentlyFav) {
+            showRowModal(podcast.id);
+        }
     };
 
     const handlePlay = (podcast) => {
@@ -64,7 +65,6 @@ const DataDisplay = () => {
                 const response = await fetch(itunesUrl);
                 const data = await response.json();
                 if (data.results) {
-                    const savedFavorites = JSON.parse(localStorage.getItem('my_podcast_favorites')) || [];
                     const formattedData = data.results.map((item) => {
                         const id = item.trackId || item.collectionId || Math.random();
                         return {
@@ -75,7 +75,6 @@ const DataDisplay = () => {
                             speaker: item.artistName || item.collectionName || "Various Hosts",
                             previewUrl: item.previewUrl,
                             duration: formatDuration(item.trackTimeMillis),
-                            favorite: savedFavorites.includes(id)
                         };
                     });
                     setPodcasts(formattedData);
@@ -107,35 +106,47 @@ const DataDisplay = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {podcasts.map((podcast, index) => (
-                        <tr key={podcast.id} style={{ borderBottom: "1px solid #444" }}>
-                            <td style={cellStyle}>{index + 1}</td>
-                            <td style={cellStyle}>
-                                <img src={podcast.coverImage} alt="Cover" style={imgStyle} />
-                            </td>
-                            <td style={{ ...cellStyle, fontWeight: "bold" }}>{podcast.title}</td>
-                            <td style={cellStyle}>{podcast.tag}</td>
-                            <td style={cellStyle}>{podcast.speaker}</td>
-                            <td
-                                style={{ ...cellStyle, cursor: "pointer", color: playingId === podcast.id ? "#ff4b4b" : "white" }}
-                                onClick={() => handlePlay(podcast)}
-                            >
-                                {playingId === podcast.id ? "⏸ Playing" : podcast.duration}
-                            </td>
+                    {podcasts.map((podcast, index) => {
+                        // 4. CHECK IF PODCAST IS IN GLOBAL FAVORITES
+                        const isFav = favorites.some(fav => fav.id === podcast.id);
 
-                            <td style={{ ...cellStyle, cursor: "pointer", position: "relative", overflow: "visible" }} onClick={() => toggleFavorite(podcast.id)}>
-                                {activeRowId === podcast.id && <span style={rowModalStyle}>Added to Favorite</span>}
-                                <Heart size={20} color={podcast.favorite ? "#ff4b4b" : "white"} fill={podcast.favorite ? "#ff4b4b" : "none"} />
-                            </td>
-                        </tr>
-                    ))}
+                        return (
+                            <tr key={podcast.id} style={{ borderBottom: "1px solid #444" }}>
+                                <td style={cellStyle}>{index + 1}</td>
+                                <td style={cellStyle}>
+                                    <img src={podcast.coverImage} alt="Cover" style={imgStyle} />
+                                </td>
+                                <td style={{ ...cellStyle, fontWeight: "bold" }}>{podcast.title}</td>
+                                <td style={cellStyle}>{podcast.tag}</td>
+                                <td style={cellStyle}>{podcast.speaker}</td>
+                                <td
+                                    style={{ ...cellStyle, cursor: "pointer", color: playingId === podcast.id ? "#ff4b4b" : "white" }}
+                                    onClick={() => handlePlay(podcast)}
+                                >
+                                    {playingId === podcast.id ? "⏸ Playing" : podcast.duration}
+                                </td>
+
+                                <td 
+                                    style={{ ...cellStyle, cursor: "pointer", position: "relative", overflow: "visible" }} 
+                                    onClick={() => handleFavoriteClick(podcast)}
+                                >
+                                    {activeRowId === podcast.id && <span style={rowModalStyle}>Added to Favorite</span>}
+                                    <Heart 
+                                        size={20} 
+                                        color={isFav ? "#ff4b4b" : "white"} 
+                                        fill={isFav ? "#ff4b4b" : "none"} 
+                                    />
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>
     );
 };
 
-// Styles
+// Styles (unchanged)
 const cellStyle = { padding: "12px", borderBottom: "1px solid #444", fontSize: "14px", textAlign: "center" };
 const imgStyle = { width: "50px", height: "50px", borderRadius: "4px", objectFit: "cover" };
 const containerStyle = { width: "100%", height: "58vh", overflowY: "auto", overflowX: "hidden", backgroundColor: "#121212" };

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '../../context/favoriteContext';
+import { SearchContext } from '../searchContext';
 
 const formatDuration = (ms) => {
     if (!ms) return "0:00";
@@ -13,10 +14,14 @@ const formatDuration = (ms) => {
     return hrs > 0 ? `${hrs}:${minsStr}:${secsStr}` : `${mins}:${secsStr}`;
 };
 
-const FinanceDisplay = () => {
-    // 2. Access global favorites state and toggle function
-    const { favorites, toggleFavorite } = useFavorites();
+const Search = () => {
 
+
+  
+    const {submittedQuery} = useContext(SearchContext);
+    // 2. Access global favorites and the toggle function
+    const { favorites, toggleFavorite } = useFavorites();
+    
     const [podcasts, setPodcasts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeRowId, setActiveRowId] = useState(null);
@@ -35,11 +40,12 @@ const FinanceDisplay = () => {
         };
     }, [audio]);
 
-    // 3. Updated Favorite Handler: Uses global context
+    // 3. UPDATED: Uses the context toggle and handles the "Added" modal
     const handleFavoriteClick = (podcast) => {
         const isCurrentlyFav = favorites.some(fav => fav.id === podcast.id);
         toggleFavorite(podcast);
         
+        // Only show the "Added" popup if we are favoriting it (not removing)
         if (!isCurrentlyFav) {
             showRowModal(podcast.id);
         }
@@ -58,8 +64,11 @@ const FinanceDisplay = () => {
     };
 
     useEffect(() => {
+
+        if(!submittedQuery) return;
+
         const getPodcasts = async () => {
-            const itunesUrl = 'https://itunes.apple.com/search?term=finance&entity=podcastEpisode&limit=100&genreId=1412';
+            const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(submittedQuery)}&entity=podcastEpisode&limit=100`;
             try {
                 const response = await fetch(itunesUrl);
                 const data = await response.json();
@@ -70,7 +79,7 @@ const FinanceDisplay = () => {
                             id: id,
                             coverImage: item.artworkUrl600 || item.artworkUrl100,
                             title: item.trackName || item.collectionName,
-                            tag: item.primaryGenreName || "Finance",
+                            tag: item.primaryGenreName || "Podcast",
                             speaker: item.artistName || item.collectionName || "Various Hosts",
                             previewUrl: item.previewUrl,
                             duration: formatDuration(item.trackTimeMillis),
@@ -85,7 +94,7 @@ const FinanceDisplay = () => {
             }
         };
         getPodcasts();
-    }, []);
+    }, [submittedQuery]);
 
     if (loading) return <div style={{ color: "white", padding: "20px" }}>Loading Podcasts...</div>;
     if (podcasts.length === 0) return <div style={{ color: "white", padding: "20px" }}>No podcasts found.</div>;
@@ -106,7 +115,7 @@ const FinanceDisplay = () => {
                 </thead>
                 <tbody>
                     {podcasts.map((podcast, index) => {
-                        // 4. Reactive check: Is this podcast in global favorites?
+                        // 4. CHECK IF PODCAST IS IN GLOBAL FAVORITES
                         const isFav = favorites.some(fav => fav.id === podcast.id);
 
                         return (
@@ -145,6 +154,7 @@ const FinanceDisplay = () => {
     );
 };
 
+// Styles (unchanged)
 const cellStyle = { padding: "12px", borderBottom: "1px solid #444", fontSize: "14px", textAlign: "center" };
 const imgStyle = { width: "50px", height: "50px", borderRadius: "4px", objectFit: "cover" };
 const containerStyle = { width: "100%", height: "58vh", overflowY: "auto", overflowX: "hidden", backgroundColor: "#121212" };
@@ -155,4 +165,4 @@ const rowModalStyle = {
     pointerEvents: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', animation: 'popAndFade 3s ease-out forwards'
 };
 
-export default FinanceDisplay;
+export default Search;
