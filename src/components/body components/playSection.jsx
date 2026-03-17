@@ -17,7 +17,7 @@ const PlaySection = () => {
         <div id='currentlyPlaying'
          style={{width:"10%", display:'grid', placeItems:'center', padding: '8px'}}
         >
-       <h4> Is this playing </h4>
+       <h4> Animated Voice State </h4>
         {/*<Lottie animationData={voiceAnimation} loop={isPlaying} autoplay={isPlaying} />*/}
         </div>
 

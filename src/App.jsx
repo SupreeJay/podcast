@@ -2,8 +2,8 @@ import React from 'react'
 import './App.css'
 import Body  from './components/body'
 import Sidebar from './components/sidebar'
-
 function App() {
+
   return (
 <>
 <Sidebar/>
@@ -11,4 +11,5 @@ function App() {
 </>
   )
 }
+
 export default App
